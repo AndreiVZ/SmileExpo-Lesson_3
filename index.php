@@ -1,3 +1,75 @@
+<style>
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    font-family: "Georgia";
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.floating-box {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid #73AD21;  
+}
+
+p.day-part {font-size:18px; text-align: center;font-weight:700;}
+p.day-temp {font-size:30px;}
+p.day-descr {font-size:15px;text-transform:uppercase;}
+div.day-param {font-size:15px;}
+</style>
+
+<script>
+function openData(evt, date) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(date).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
+
 <?php
 
 /**
@@ -62,19 +134,6 @@ function loadOpenWeatherMap($city_id) {
    return $json_string;
 }
 
-// декодируем строку JSON
-$obj = json_decode(loadOpenWeatherMap($city_id));
-
-
-echo $obj->list[0]->dt_txt;
-echo '<br>';
-
-$arr_dt = getDayDate($obj->list[0]->dt_txt);
-echo $arr_dt['time_text'];
-echo '<br>';
-echo $arr_dt['date_format'];
-echo '<br>';
-
 /**
  * Функция принимает строку с датой и временем, 
  * определяет время дня в текстовом виде и преобразует дату в нужный формат.
@@ -115,50 +174,118 @@ function getDayDate($date) {
    return $array;
 }
 
-// {
-// $date = strtotime($date);
-// $months = array('','/01','/02','/03','/04','/05','/06','/07','/08','/09','/10','/11','/12');
-// $days = array('ВС','ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ');
-// return $days[date('w', $date)].', '.(int)date('d',$date).' '.$months[date('n', $date)];
-// }
+/**
+ * Функция принимает температуру по Кельвину и преобразует ее в Цильсий с добавлением знака. 
+ * -273.15 абсолютный 0 по Кельвину.
+ */
+function getTempConvert($temp)
+{
+   $temp = round(-273.15 + $temp);
+   return $temp > 0 ? '+'.$temp.' °C' : $temp.' °C';
+}
 
-// echo $obj->city->name;
-// echo '<br>';
-// echo $obj->list[0]->dt_txt;
-// echo '<br>';
-// echo $obj->list[0]->main->temp.'   '.$obj->list[0]->weather[0]->icon;
-// echo '<br>';
-// echo $obj->list[0]->weather[0]->description;
-// echo '<br>';
-// echo $obj->list[0]->wind->deg.'   '.$obj->list[0]->wind->speed;
-// echo '<br>';
-// echo $obj->list[0]->main->pressure;
-// echo '<br>';
-// echo $obj->list[0]->main->humidity;
-// echo '<br>';
-// echo '<br>';
+/**
+ * Функция принимает атм. давление в гектопаскалях и преобразует в миллиметр ртутного столба
+ * по формуле: 1 hPa = 0.75006375541921 mmHg
+ */
+function getPressure_mmHg($pressure)
+{
+   $pressure *= 0.75006375541921;
+   return round($pressure);
+}
 
+/**
+ * Функция принимает направление ветра в градусах, 
+ * преобразует в одно из 8 направлений (N, NE, E, SE, S, SW, W, NW).
+ * Функция возвращает строку с указателем направления и его буквенным обозначением.
+ */
+function getWindDirection($wind)
+{
+   // проверяем какому из 8 направлений сответствует значение в градусах
+   $wind = round($wind / 45);
+   switch ($wind) {
+      case 0:
+         $wind_direction = '&#8593; S';
+         break;
+      case 8:
+         $wind_direction = '&#8593; S';
+         break;
+      case 1:
+         $wind_direction = '&#8599; SW';
+         break;
+      case 2:
+         $wind_direction = '&#8594; W';
+         break;
+      case 3:
+         $wind_direction = '&#8600; NW';
+         break;
+      case 4:
+         $wind_direction = '&#8595; N';
+         break;
+      case 5:
+         $wind_direction = '&#8601; NE';
+         break;
+      case 6:
+         $wind_direction = '&#8592; E';
+         break;
+      case 7:
+         $wind_direction = '&#8598; SE';
+         break;
+      default:
+         $wind_direction = "Undefined";
+   }
 
-// DofW, day / month
-// dt_txt [Morning Afternoon Evening Night]
-// temp °C 'icon'
-// description
-// wind: list.wind.deg [nw] list.wind.speed mps
-// pressure: list.main.pressure hPa mmHg
-// humidity: list.main.humidity %
+   return $wind_direction;
+}
 
-// // получаем знак температуры
-// function getTempSign($temp)
-// {
-// $temp = (int)$temp;
-// return $temp > 0 ? '+'.$temp : $temp;
-// }
-// // получаем направления ветра
-// function getWindDirection($wind)
-// {
-// $wind = (string)$wind;
-// $wind_direction = array('s'=>'&#8593; ю','n'=>'&#8595; с','w'=>'&#8594; з','e'=>'&#8592; в','sw'=>'&#8599; юз','se'=>'&#8598; юв','nw'=>'&#8600; сз','ne'=>'&#8601; св');
-// return $wind_direction[$wind];
-// }
-
+// декодируем строку JSON
+$obj = json_decode(loadOpenWeatherMap($city_id));
 ?>
+
+
+
+<div class="tab">
+<?php
+   // $date_old понадобится, чтобы дата в заголовке не повторялась
+   $date_old = array();
+   // создадим Tab links, в качестве заголовка дата
+   foreach($obj->list as $list) {
+   $arr_dt = getDayDate($list->dt_txt);
+
+   // если в масиив $date_old дата еще не записана
+   if (!array_key_exists($arr_dt['date_format'],$date_old)) {?><button class="tablinks" onclick="openData(event, <?php echo '\''.$arr_dt['date_format'].'\'';?>)"><?php echo $arr_dt['date_format'];?></button>
+   <?php
+   $date_old[$arr_dt['date_format']] = 1;
+   }
+}?>
+</div>
+<div>
+
+<?php
+   // $date_old понадобится, чтобы к  каждой дате заголовка привязывались только его прогнозы
+   $date_old = array();
+   // выведем в цикле прогноз погоды на 5 дней
+   foreach($obj->list as $list) {
+   $arr_dt = getDayDate($list->dt_txt);
+   // если в масиив $date_old дата еще не записана
+   if (!array_key_exists($arr_dt['date_format'],$date_old)) {?></div><div id="<?php echo $arr_dt['date_format'];?>" class="tabcontent">
+   <?php
+   $date_old[$arr_dt['date_format']] = 1;
+   }
+
+   // выводим только промежутки "Night", "Morning", "Afternoon", "Evening"
+   if ($arr_dt['time_text'] != 'Undefined') {
+   ?>
+   <div class="floating-box">
+   <p class="day-part"><?php echo $arr_dt['time_text'];?></p>
+   <div><p class="day-temp"><?php echo getTempConvert($list->main->temp);?>
+   <img src='icons2/<?php echo $list->weather[0]->icon;?>.png' width="48" height="48" /></p></div>
+   <p class="day-descr"><strong><?php echo $list->weather[0]->description;?></strong></p>
+   <div class="day-param">
+   <p><?php echo 'wind: '.getWindDirection($list->wind->deg).'   '.$list->wind->speed.' mps';?></p>
+   <p><?php echo 'humidity: '.$list->main->humidity.'%';?></p>
+   <p><?php echo 'pressure: '.getPressure_mmHg($list->main->pressure).' mmHg';?></p><br></div></div>
+<?php 
+   }   
+}?>
+</div>
