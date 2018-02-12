@@ -1,0 +1,71 @@
+body {
+         font: 100% arial, helvetica, sans-serif;
+      }
+
+      fieldset {
+         padding: 0 1em;
+      }
+
+      legend {
+         padding: 1em;
+      }
+
+   /* Style the tab */
+   .tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+   }
+
+   /* Style the buttons inside the tab */
+   .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+   }
+
+   /* Change background color of buttons on hover */
+   .tab button:hover {
+      background-color: #ddd;
+   }
+
+   /* Create an active/current tablink class */
+   .tab button.active {
+      background-color: #ccc;
+   }
+
+   /* Style the tab content */
+   .tabcontent {
+      font-family: "Georgia";
+      display: none;
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-top: none;
+   }
+
+   .floating-box {
+      display: inline-block;
+      width: auto;
+      height: auto;
+      margin: 10px;
+      padding: 10px;
+      border: 2px solid #73AD21;  
+   }
+
+   p.day-part {
+      font-family: "Georgia";
+      font-size:18px; 
+      text-align: center;
+      font-weight:700;
+   }
+   p.day-descr {
+      font-size:15px;
+      text-transform:uppercase;
+   }
+   p.day-temp {font-size:30px;}
+   div.day-param {font-size:15px;}

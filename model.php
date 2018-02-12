@@ -1,6 +1,37 @@
 <?php
 
-/**
+/*
+ * "Модель" MVC
+ * Функция принимает название города, запрошенного пользователем.
+ * Функция возвращает многомерный массив данных, декодированных из JSON
+ */
+function model($cityName) {
+
+   // id города из файла city.list.json.gz
+   $city_id = getCityID($cityName); 
+   // API key for api.openweathermap.org
+   $api_key = 'ba53279f5f36a4546d18433a0c4d5c86'; 
+   // адрес ресурса прогноза на 5 дней
+   $GLOBALS['url'] = sprintf('api.openweathermap.org/data/2.5/forecast?id=%s&APPID=%s', $city_id , $api_key);
+   //время кэша файла в секундах, 3600=1 час (Нет смысла обновлять файл чаще, чем 1 раз в час)
+   $GLOBALS['cache_lifetime'] = 3600; 
+
+   // декодируем строку JSON
+   $obj = json_decode(loadOpenWeatherMap($city_id));
+
+   // в цикле заменим значения параметров на адаптированные под нашу местность, 
+   // для доступа к ним "Представления" MVC из "Контроллера" MVC
+   foreach($obj->list as $list) {
+      $list->dt_txt = getDayDate($list->dt_txt);
+      $list->main->temp = getTempConvert($list->main->temp);
+      $list->wind->deg = getWindDirection($list->wind->deg);
+      $list->main->pressure = getPressure_mmHg($list->main->pressure);
+   }
+
+   return $obj;
+}
+
+/*
  * Функция принимает название города и возвращает его id из файла city.list.json.gz 
  */
 function getCityID($city)
@@ -21,7 +52,7 @@ function getCityID($city)
    return $array_id[$city];
 }
 
-/**
+/*
  * Функция принимает переметр $city_id - id выбранного города из файла city.list.json.gz,
  * по нему загружаются данные из API (api.openweathermap.org).
  * Т.к. кол-во запросов в ед.времени ограничено сервером, а информация о погоде меняется не слишком часто,
@@ -71,7 +102,7 @@ function loadOpenWeatherMap($city_id) {
    return $json_string;
 }
 
-/**
+/*
  * Функция принимает строку с датой и временем, 
  * определяет время дня в текстовом виде и преобразует дату в нужный формат.
  * Функция возвращает массив с этими значениями.
@@ -111,7 +142,7 @@ function getDayDate($date) {
    return $array;
 }
 
-/**
+/*
  * Функция принимает температуру по Кельвину и преобразует ее в Цильсий с добавлением знака. 
  * -273.15 абсолютный 0 по Кельвину.
  */
@@ -121,7 +152,7 @@ function getTempConvert($temp)
    return $temp > 0 ? '+'.$temp.' °C' : $temp.' °C';
 }
 
-/**
+/*
  * Функция принимает атм. давление в гектопаскалях и преобразует в миллиметр ртутного столба
  * по формуле: 1 hPa = 0.75006375541921 mmHg
  */
@@ -131,7 +162,7 @@ function getPressure_mmHg($pressure)
    return round($pressure);
 }
 
-/**
+/*
  * Функция принимает направление ветра в градусах, 
  * преобразует в одно из 8 направлений (N, NE, E, SE, S, SW, W, NW).
  * Функция возвращает строку с указателем направления и его буквенным обозначением.
