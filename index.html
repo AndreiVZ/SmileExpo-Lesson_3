@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8">
+   <title>Select menus</title>
+   <style>
+      body {
+         font: 100% arial, helvetica, sans-serif;
+      }
+
+      fieldset {
+         padding: 0 1em;
+      }
+
+      legend {
+         padding: 1em;
+      }
+   </style>
+</head>
+<body>
+   <form action="controller.php" method="get">
+      <fieldset>
+         <legend>For weather forecast, please select a city</legend>
+         <select name="city" id="city">
+         <optgroup label="Russia">
+             <option value="Yaroslavl">Yaroslavl</option> <!-- 468902 -->
+             <option value="Moscow">Moscow</option> <!-- 524901 -->
+             <option value="Sankt-Peterburg">Sankt-Peterburg</option> <!-- 536203 -->
+             <option value="Ivanovo">Ivanovo</option> <!-- 6608392 -->
+             <option value="Vladimir">Vladimir</option> <!-- 2013364 -->
+             <option value="Ryazan">Ryazan</option> <!-- 500095 -->
+         </optgroup>
+         <optgroup label="Ukraine">
+             <option value="Kiev">Kiev</option> <!-- 703448 -->
+             <option value="Kharkiv">Kharkiv</option> <!-- 706483 -->
+         </optgroup>
+         </select>
+         <p><input type="submit" value="Select"/></p>
+      </fieldset>
+   </form>
+
+</body>
+</html>
